@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simulasi ABM Akses Mall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&family=Playfair+Display:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">ABM</div>
+        <div>
+          <h1>Simulasi ABM Akses Mall</h1>
+          <p>Agent-Based Model · Akses Mall</p>
+        </div>
+      </div>
+      <time id="clock" class="clock">--:--:--</time>
+    </header>
+
+    <main class="dashboard">
+      <div class="display-title" aria-hidden="true">MALL ACCESS</div>
+
+      <aside class="sidebar" aria-label="Navigasi simulasi">
+        <div class="profile">
+          <div class="avatar">TP</div>
+          <div>
+            <strong>Peneliti</strong>
+            <span>Admin</span>
+          </div>
+        </div>
+        <nav>
+          <a href="#" class="nav-item">Dashboard</a>
+          <a href="#" class="nav-item active">Simulasi</a>
+          <a href="#" class="nav-item">Analitik</a>
+          <a href="#" class="nav-item">Laporan</a>
+          <a href="#" class="nav-item">Pengaturan</a>
+        </nav>
+        <div class="app-info">
+          <span>Model</span>
+          <strong>Mesa ABM</strong>
+          <small>Kolisi arus masuk, keluar, dan jalur lambat satu arah.</small>
+        </div>
+      </aside>
+
+      <section class="main-stage" aria-label="Area simulasi">
+        <div class="canvas-wrapper">
+          <div class="canvas-toolbar" aria-label="Toolbar canvas">
+            <button type="button">Search</button>
+            <button type="button">Tampilan</button>
+            <button type="button" id="fullscreen">Fullscreen</button>
+          </div>
+          <canvas id="trafficCanvas" width="940" height="620"></canvas>
+          <div class="canvas-overlay">
+            <div><span>Kendaraan Aktif</span><strong id="overlayActive">0</strong></div>
+            <div><span>Mobil Menunggu</span><strong id="overlayCarWaiting">0</strong></div>
+            <div><span>Kemacetan</span><strong id="overlayCongestion">0%</strong></div>
+          </div>
+        </div>
+
+        <section class="stat-grid" aria-label="Statistik simulasi">
+          <article class="stat-card" id="congestionCard">
+            <span class="stat-label">Kemacetan</span>
+            <strong class="stat-value" id="congestion">0%</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Kendaraan Aktif</span>
+            <strong class="stat-value blue" id="active">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Mobil Menunggu</span>
+            <strong class="stat-value" id="carWaiting">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Motor Menunggu</span>
+            <strong class="stat-value yellow" id="motorWaiting">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Kec. Rata-rata</span>
+            <strong class="stat-value" id="avgSpeed">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Near Collision</span>
+            <strong class="stat-value yellow" id="nearCollisions">0</strong>
+          </article>
+        </section>
+
+        <section class="chart-card" aria-label="Grafik kendaraan aktif">
+          <div class="section-heading">
+            <span>Volume & Transit</span>
+            <strong id="chartPeak">Peak 0</strong>
+          </div>
+          <canvas id="volumeChart" width="760" height="130"></canvas>
+        </section>
+      </section>
+
+      <aside class="control-panel" aria-label="Kontrol simulasi">
+        <div class="section-heading">
+          <div>
+            <span>Kontrol Simulasi</span>
+            <strong>Total kendaraan: <b id="totalVehicles">0</b></strong>
+          </div>
+          <select aria-label="Periode simulasi">
+            <option>Bulan ini</option>
+            <option>Hari ini</option>
+            <option>Skenario</option>
+          </select>
+        </div>
+
+        <div class="controls">
+          <label class="slider-field">
+            <span>Volume mobil / menit</span>
+            <output id="carVolumeValue">28</output>
+            <input id="carVolume" type="range" min="0" max="100" value="28" aria-label="Volume mobil per menit" />
+          </label>
+          <label class="slider-field">
+            <span>Volume motor / menit</span>
+            <output id="motorVolumeValue">42</output>
+            <input id="motorVolume" type="range" min="0" max="100" value="42" aria-label="Volume motor per menit" />
+          </label>
+          <label class="slider-field">
+            <span>Flow masuk mall</span>
+            <output id="entryFlowValue">35</output>
+            <input id="entryFlow" type="range" min="0" max="100" value="35" aria-label="Flow masuk mall" />
+          </label>
+          <label class="slider-field">
+            <span>Flow keluar mall</span>
+            <output id="exitFlowValue">30</output>
+            <input id="exitFlow" type="range" min="0" max="100" value="30" aria-label="Flow keluar mall" />
+          </label>
+          <label class="slider-field">
+            <span>Kesabaran individu</span>
+            <output id="patienceValue">18</output>
+            <input id="patience" type="range" min="0" max="30" value="18" aria-label="Kesabaran individu" />
+          </label>
+          <label class="seed-field">
+            <span>Seed</span>
+            <input id="seed" class="seed-input" type="number" min="0" placeholder="acak" aria-label="Seed simulasi" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="toggleRun" class="secondary" type="button">Pause</button>
+          <button id="reset" class="primary" type="button" title="Reset semua parameter?">Reset</button>
+        </div>
+
+        <section class="vehicle-list" aria-label="Daftar antrian kendaraan">
+          <div class="section-heading">
+            <span>Log Antrian</span>
+            <strong id="queueCount">0 item</strong>
+          </div>
+          <div id="vehicleList" class="vehicle-items"></div>
+        </section>
+      </aside>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
